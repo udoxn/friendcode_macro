@@ -2,11 +2,14 @@ import pyautogui
 import dataclasses
 import pyocr
 import keyboard
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 @dataclasses.dataclass
 class FCRegion:
-    left: int = 585
-    top: int = 695
+    left: int = int(os.getenv('FCREGION_LEFT'))
+    top: int = int(os.getenv('FCREGION_TOP'))
     width: int = 350
     height: int = 65
 
@@ -22,19 +25,16 @@ def fc_generate():
         lang='eng',
         builder=pyocr.builders.TextBuilder(tesseract_layout=6)
     )
-    if not fc_str:
-        print('Empty!!')
-        return False
 
     fc_str = fc_str.lower()
 
-    if len(fc_str) >= 7:
-        # fc_strが7文字以上の場合,フレコをリセット
+    if len(fc_str) >= 7 or not fc_str:
+        # fc_strが7文字以上の場合,フレコをリセット,Trueを返す
         pyautogui.click('reset-button.png')
         print('Skip:', fc_str)
         return True
     else:
-        # 7文字未満ならフレコを設定して終了
+        # 7文字未満ならフレコを設定して終了,Falseを返す
         pyautogui.click('done-button.png')
         print('Success!!\nYour friend code:', fc_str)
         return False
